@@ -1,6 +1,13 @@
 
 #include <iostream>
 #include <utility>
+#include <tuple>
+
+// kms... https://stackoverflow.com/questions/19572512
+template <typename T1, typename T2>
+std::pair<T1, T2> mp(T1&& a, T2&& b) {
+	return { a, b };
+}
 
 std::pair<int, bool> perform_euclidean_algo(int a, int b) {
 	// Check for the 0 cases
@@ -13,13 +20,13 @@ std::pair<int, bool> perform_euclidean_algo(int a, int b) {
 	}
 
 	if (a == b) { // gcd of 5, 5 is 5
-		return { a, true }
+		return { a, true };
 	}
 
 	// get the difference between the numbers (positive difference)
 	// and reperform eucl algo
-	int c = (a < b) ? b - a : a - b;
-	return perform_euclidean_algo(a, c);
+	auto [na, nb] = (a < b) ? mp(a, b - a) : mp(b, a - b);
+	return perform_euclidean_algo(na, nb);
 }
 
 int main(int ac, char **av) {
@@ -36,8 +43,8 @@ int main(int ac, char **av) {
 	if (valid) {
 		std::cout << "GCD:: " << gcd << std::endl;
 	} else {
-		std::cout << "No GCD founc" << std::endl;
+		std::cout << "No GCD found" << std::endl;
 	}
-	
+
 	return 0;
 }
