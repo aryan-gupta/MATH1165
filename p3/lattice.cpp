@@ -3,13 +3,20 @@
 #include <vector>
 #include <utility>
 #include <tuple>
+#include <limits>
 
 using std::cin;
 using std::cout;
 using std::endl;
 using std::vector;
 
-using ull = unsigned long long;
+#ifdef USE_FLOAT
+using ull = long double;
+constexpr ull MAX = std::numeric_limits<ull>::max();
+#else
+using ull = uintmax_t;
+constexpr ull MAX = UINTMAX_MAX;
+#endif
 
 ull get_map_element(vector<vector<ull>> &map, size_t x, size_t y) {
 	if (y < x) { // The top triangle is the same as the bottom one
@@ -30,6 +37,10 @@ ull calculate_lattice_paths(size_t n) {
 		for (size_t jj = 1; jj <= ii; ++jj) {
 			ull left = get_map_element(map, jj - 1, ii);
 			ull top = get_map_element(map, jj, ii - 1);
+			if ((left > 0) && (top > MAX - left)) {
+				cout << "Overflow error" << endl;
+				return 0;
+			}
 			map[ii][jj] = left + top;
 
 			// std::cout << "(" << ii << ", " << jj << ")" << "   ";
@@ -42,11 +53,16 @@ ull calculate_lattice_paths(size_t n) {
 }
 
 int main(int ac, char **av) {
+#ifdef USE_FLOAT
+	cout << "Using floating point. Max dim is 8195. Compile with g++ <file> to use uintmax_t\n";
+#else
+	cout << "Max dim is 33. If larger dim (up to 8195) is needed compile with g++ -DUSE_FLOAT <file>\n";
+#endif
 	cout << "Enter dimensions:: ";
 	int n;
 	cin >> n;
 
 	ull num = calculate_lattice_paths(n);
 
-	cout << num << endl;
+	cout << std::fixed << num << endl;
 }
