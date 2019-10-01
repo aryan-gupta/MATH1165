@@ -5,6 +5,8 @@
 #include <cmath>
 #include <assert.h>
 
+namespace detail {
+
 // kms... https://stackoverflow.com/questions/19572512
 template <typename T1, typename T2>
 std::pair<T1, T2> mp(T1&& a, T2&& b) {
@@ -18,44 +20,54 @@ std::pair<int, int> division_algo(int num, int den) {
 	return { quot, rem };
 }
 
-std::tuple<int, bool, int, int> perform_euclidean_algo(int a, int b) {
-	// Check for the 0 cases
-	if (a == 0 and b == 0) { // a nor b
-		return { 0, false, 0, 0 };
-	}
-
+std::tuple<int, int, int> perform_euclidean_algo(int a, int b) {
 	// Do division algo: a = b * quot + rem
 #ifdef __cpp_structured_bindings
-	auto [quot, rem] = ::division_algo(a, b);
+	auto [quot, rem] = detail::division_algo(a, b);
 #else
 	int quot, rem;
-	std::tie(quot, rem) = ::division_algo(a, b);
+	std::tie(quot, rem) = detail::division_algo(a, b);
 #endif
 
 	std::cout << a << " = " << b << " * " << quot << " + " << rem << std::endl;
 
-	// if we found the gcd then return true
+	// if we found the gcd
 	if (rem == 0) {
-		return { b, true, 0, 0 };
+		return { b, 0, 0 };
 	}
 
 #ifdef __cpp_structured_bindings
-	auto [gcd, found, u, v] = perform_euclidean_algo(b, rem);
+	auto [gcd, u, v] = perform_euclidean_algo(b, rem);
 #else
 	int gcd, u, v;
-	bool found;
-	std::tie(gcd, found, u, v) = perform_euclidean_algo(b, rem);
+	std::tie(gcd, u, v) = perform_euclidean_algo(b, rem);
 #endif
 
-	assert(found == true); // for debugging
-
 	if (u == 0 and v == 0) {
-		return { gcd, found, 1, 1 };
+		return { gcd, 1, quot };
 	}
 
 	int new_v = v * quot + u;
 	u = v;
 	v = new_v;
+
+	return { gcd, u, v };
+}
+
+} // end namespace detail
+
+std::tuple<int, bool, int, int> gcd_valid_lc(int a, int b) {
+	// Check for the 0 cases
+	if (a == 0 and b == 0) { // a nor b
+		return { 0, false, 0, 0 };
+	}
+
+#ifdef __cpp_structured_bindings
+	auto [gcd, u, v] = detail::perform_euclidean_algo(a, b);
+#else
+	int gcd, u, v;
+	std::tie(gcd, u, v) = detail::perform_euclidean_algo(a, b);
+#endif
 
 	return { gcd, true, u, v };
 }
@@ -73,10 +85,10 @@ int main(int ac, char **av) {
 	}
 
 #ifdef __cpp_structured_bindings
-	auto [gcd, valid, x, y] = ::perform_euclidean_algo(num1, num2);
+	auto [gcd, valid, x, y] = ::gcd_valid_lc(num1, num2);
 #else
 	int gcd; bool valid; int x, y;
-	std::tie(gcd, valid, x, y) = ::perform_euclidean_algo(num1, num2);
+	std::tie(gcd, valid, x, y) = ::gcd_valid_lc(num1, num2);
 #endif
 	if (valid) {
 		std::cout << "GCD:: " << gcd << std::endl;
