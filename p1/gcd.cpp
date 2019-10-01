@@ -33,7 +33,7 @@ std::tuple<int, int, int> perform_euclidean_algo(int a, int b) {
 
 	// if we found the gcd
 	if (rem == 0) {
-		return { b, 0, 0 };
+		return { b, 0, quot };
 	}
 
 #ifdef __cpp_structured_bindings
@@ -43,9 +43,9 @@ std::tuple<int, int, int> perform_euclidean_algo(int a, int b) {
 	std::tie(gcd, u, v) = perform_euclidean_algo(b, rem);
 #endif
 
-	if (u == 0 and v == 0) {
-		return { gcd, 1, quot };
-	}
+	// if (u == 0 and v == 0) {
+	// 	return { gcd, 1, quot };
+	// }
 
 	int new_v = v * quot + u;
 	u = v;
