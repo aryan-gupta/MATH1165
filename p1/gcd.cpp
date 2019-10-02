@@ -36,11 +36,9 @@ std::tuple<int, int, int> perform_euclidean_algo(int a, int b) {
 	std::tie(quot, rem) = detail::division_algo(a, b);
 #endif
 
-	std::cout << a << " = " << b << " * " << quot << " + " << rem << std::endl;
-
 	// If we found the gcd
 	if (rem == 0) {
-		return { b, 0, quot };
+		return { b, 0, 1 };
 	}
 
 	// If not then recurse in the euclidean algo
@@ -51,16 +49,10 @@ std::tuple<int, int, int> perform_euclidean_algo(int a, int b) {
 	std::tie(gcd, u, v) = perform_euclidean_algo(b, rem);
 #endif
 
-	// if (u == 0 and v == 0) {
-	// 	return { gcd, 1, quot };
-	// }
-
 	// Do backwards substitution
 	int new_v = v * quot + u;
 	u = v;
 	v = new_v;
-
-	// std::cout << a << " (" << u << ") - (" << b << ") " << v << std::endl;
 
 	return { gcd, u, v };
 }
@@ -127,8 +119,8 @@ int main(int ac, char **av) {
 #endif
 
 	if (valid) {
-		std::cout << "GCD:: " << gcd << std::endl;
-		std::cout << "Bezout's Identity:: " << x << "*" << num1 << " + " << y<< "*" << num2 << " = " << gcd << std::endl;
+		// std::cout << "GCD:: " << gcd << std::endl;
+		std::cout /*<< "Bezout's Identity:: "*/ << num1 << " (" << x << ") + " << num2 << " (" << y << ") = " << gcd << std::endl;
 	} else {
 		std::cout << "No GCD found" << std::endl;
 	}
