@@ -75,14 +75,28 @@ std::tuple<int, bool, int, int> gcd_valid_lc(int a, int b) {
 		return { 0, false, 0, 0 };
 	}
 
+	if (a == 0) {
+		int gcd = std::abs(b);
+		int lc = (b < 0) ? -1 : 1;
+		return { gcd, true, 0, lc };
+	}
+
+	if (b == 0) {
+		int gcd = std::abs(a);
+		int lc = (a < 0) ? -1 : 1;
+		return { gcd, true, lc, 0 };
+	}
+
 	// keep copy of original signs before abs()
 	int orig_a = a, orig_b = b;
 	a = std::abs(a);
 	b = std::abs(b);
 
 	// swap so a is the larger number ( a = b * x + y )
+	bool swapped = false;
 	if (a < b) {
 		std::swap(a, b);
+		swapped = true;
 	}
 
 #ifdef __cpp_structured_bindings
@@ -92,8 +106,17 @@ std::tuple<int, bool, int, int> gcd_valid_lc(int a, int b) {
 	std::tie(gcd, u, v) = detail::perform_euclidean_algo(a, b);
 #endif
 
-	if (orig_a < 0) u *= -1;
-	if (orig_b > 0) v *= -1;
+	// swap our u and v if we swapped out a and b
+	if (swapped) {
+		std::swap(u, v);
+	}
+
+	// fix for sign issues
+	if (orig_a < 0) u = -u;
+	if (orig_b < 0) v = -v;
+
+	if (orig_a * u > orig_b * v) v = -v;
+	else u = -u;
 
 	return { gcd, true, u, v };
 }
@@ -119,8 +142,8 @@ int main(int ac, char **av) {
 #endif
 
 	if (valid) {
-		// std::cout << "GCD:: " << gcd << std::endl;
-		std::cout /*<< "Bezout's Identity:: "*/ << num1 << " (" << x << ") + " << num2 << " (" << y << ") = " << gcd << std::endl;
+		std::cout << gcd << " = " << num1 << " (" << x << ") + " << num2 << " (" << y << ")" << std::endl;
+		// std::cout << gcd << " " << num1 << " " << x << " " << num2 << " " << y << std::endl;
 	} else {
 		std::cout << "No GCD found" << std::endl;
 	}
