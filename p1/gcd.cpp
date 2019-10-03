@@ -124,12 +124,16 @@ std::tuple<int, bool, int, int> gcd_valid_lc(int a, int b) {
 
 
 int main(int ac, char **av) {
-	std::cout << "Enter Number 1::";
-	int num1;
-	std::cin >> num1;
-	std::cout << "Enter Number 2::";
-	int num2;
-	std::cin >> num2;
+	int num1 = 0, num2 = 0;
+	if (ac == 3) {
+		num1 = std::atoi(av[1]);
+		num2 = std::atoi(av[2]);
+	} else {
+		std::cout << "Enter Number 1::";
+		std::cin >> num1;
+		std::cout << "Enter Number 2::";
+		std::cin >> num2;
+	}
 
 /// Im not sure if your C++ compiler has this feature. It came out in 2017 and may need
 /// special flags to compile it, so I'm adding these PPD if you have a legacy compiler
