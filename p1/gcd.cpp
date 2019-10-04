@@ -30,10 +30,10 @@ std::pair<int, int> division_algo(int num, int den) {
 std::tuple<int, int, int> perform_euclidean_algo(int a, int b) {
 	// Do division algo: a = b * quot + rem
 #ifdef __cpp_structured_bindings
-	auto [quot, rem] = detail::division_algo(a, b);
+	auto [quot, rem] = division_algo(a, b);
 #else
 	int quot, rem;
-	std::tie(quot, rem) = detail::division_algo(a, b);
+	std::tie(quot, rem) = division_algo(a, b);
 #endif
 
 	// If we found the gcd
@@ -51,10 +51,8 @@ std::tuple<int, int, int> perform_euclidean_algo(int a, int b) {
 
 	// Do backwards substitution
 	int new_v = v * quot + u;
-	u = v;
-	v = new_v;
 
-	return { gcd, u, v };
+	return { gcd, v, new_v };
 }
 
 } // end namespace detail
@@ -70,6 +68,8 @@ std::tuple<int, int, int> perform_euclidean_algo(int a, int b) {
 /// @return The linear combination for a
 /// @return The linear combination for b
 std::tuple<int, bool, int, int> gcd_valid_lc(int a, int b) {
+	using namespace detail;
+
 	// Check for the 0 cases
 	if (a == 0 and b == 0) { // a nor b
 		return { 0, false, 0, 0 };
@@ -100,10 +100,10 @@ std::tuple<int, bool, int, int> gcd_valid_lc(int a, int b) {
 	}
 
 #ifdef __cpp_structured_bindings
-	auto [gcd, u, v] = detail::perform_euclidean_algo(a, b);
+	auto [gcd, u, v] = perform_euclidean_algo(a, b);
 #else
 	int gcd, u, v;
-	std::tie(gcd, u, v) = detail::perform_euclidean_algo(a, b);
+	std::tie(gcd, u, v) = perform_euclidean_algo(a, b);
 #endif
 
 	// swap our u and v if we swapped out a and b
@@ -117,6 +117,8 @@ std::tuple<int, bool, int, int> gcd_valid_lc(int a, int b) {
 
 	if (orig_a * u > orig_b * v) v = -v;
 	else u = -u;
+
+	assert(gcd == (orig_a * u + orig_b * v));
 
 	return { gcd, true, u, v };
 }
@@ -139,10 +141,10 @@ int main(int ac, char **av) {
 /// special flags to compile it, so I'm adding these PPD if you have a legacy compiler
 /// Both sections of code do the same thing, but the first one is newer.
 #ifdef __cpp_structured_bindings
-	auto [gcd, valid, x, y] = ::gcd_valid_lc(num1, num2);
+	auto [gcd, valid, x, y] = gcd_valid_lc(num1, num2);
 #else
 	int gcd; bool valid; int x, y;
-	std::tie(gcd, valid, x, y) = ::gcd_valid_lc(num1, num2);
+	std::tie(gcd, valid, x, y) = gcd_valid_lc(num1, num2);
 #endif
 
 	if (valid) {
