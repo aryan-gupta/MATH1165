@@ -170,9 +170,39 @@ int main(int ac, char **av) {
 #endif
 
 	if (valid and gcd == 1) {
+		// Normalize the inverse if its out of our mod space
+		if (x >= mod or x < 0) {
+			x = normalize(x, mod);
+		}
+
+		// Please ignore this next part as I only did to check if my program
+		// was giving the correct results.
+
+		// excuse me as I give every programmer an aneurysm
+		// The lambda function compares if the fractional part of 2 floats
+		// is he same. In this case it makes sure that if we multiply our
+		// number and the inverse then the fractional part is 1/mod. In other
+		// words its converting the number ( x * num / mod) in to a proper
+		// fraction and making sure its X + 1/mod.
+		// EX. 5 (mod 7) inverse is 3 (mod 7)
+		//     operand 1: 5 * 3 / 7 = 2.1428
+		//     operand 2: 1 / 7 = 0.1428
+		//     lambda strips the 2 from 2.1428 and compares 0.1428 if its the
+		//            same as operand 2
+		assert(
+			[](float a, float b) -> bool {
+				float tmp;
+				a = std::modf(a, &tmp);
+				return std::abs(a - b) < 0.01;
+			} (
+				x * num / (float)mod, // operand 1
+				1.0 / mod // operand 2
+			)
+		);
+
 		std::cout << "Inverse of " << orig_num << " (mod " << mod << ") is " << x << std::endl;
 	} else {
-		std::cout << "Inverse does not exist" << std::endl;
+		std::cout << "Inverse of " << orig_num << " (mod " << mod << ") does not exist" << std::endl;
 	}
 
 	return 0;
