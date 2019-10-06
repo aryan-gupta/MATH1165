@@ -58,6 +58,21 @@ std::tuple<int, int, int> perform_euclidean_algo(int a, int b) {
 } // end namespace detail
 
 
+/// Normalizes a number into the mod space.
+/// EX. normalizing 8 mod 5 will be 3 mod 5 because
+///     8 mod 5 === 3 mod 5 and 3 < 5 and 3 > 0
+/// @param num The number to normalize
+/// @param mod The modulus to normalize under
+/// @retern The base congruence class of \p num
+int normalize(int num, int mod) {
+#ifdef __cpp_structured_bindings
+	auto [quot, rem] = detail::division_algo(num, mod);
+#else
+	int quot, rem;
+	std::tie(quot, rem) = detail::division_algo(num, mod);
+#endif
+	return rem;
+}
 
 
 /// Calculates the GCD of 2 numbers
@@ -126,32 +141,38 @@ std::tuple<int, bool, int, int> gcd_valid_lc(int a, int b) {
 
 
 int main(int ac, char **av) {
-	int num1 = 0, num2 = 0;
+	int num = 0, mod = 0;
 	if (ac == 3) {
-		num1 = std::atoi(av[1]);
-		num2 = std::atoi(av[2]);
+		num = std::atoi(av[1]);
+		mod = std::atoi(av[2]);
 	} else {
-		std::cout << "Enter Number 1::";
-		std::cin >> num1;
-		std::cout << "Enter Number 2::";
-		std::cin >> num2;
+		std::cout << "Enter The Number:: ";
+		std::cin >> num;
+		std::cout << "Enter The Mod:: ";
+		std::cin >> mod;
+	}
+
+	// If our num is not valid in mod space then normalize it (find congruence class)
+	// Also save a copy so we can print it to the screen later
+	int orig_num = num;
+	if (num >= mod or num < 0) {
+		num = normalize(num, mod);
 	}
 
 /// Im not sure if your C++ compiler has this feature. It came out in 2017 and may need
 /// special flags to compile it, so I'm adding these PPD if you have a legacy compiler
 /// Both sections of code do the same thing, but the first one is newer.
 #ifdef __cpp_structured_bindings
-	auto [gcd, valid, x, y] = gcd_valid_lc(num1, num2);
+	auto [gcd, valid, x, y] = gcd_valid_lc(num, mod);
 #else
 	int gcd; bool valid; int x, y;
-	std::tie(gcd, valid, x, y) = gcd_valid_lc(num1, num2);
+	std::tie(gcd, valid, x, y) = gcd_valid_lc(num, mod);
 #endif
 
-	if (valid) {
-		std::cout << gcd << " = " << num1 << " (" << x << ") + " << num2 << " (" << y << ")" << std::endl;
-		// std::cout << gcd << " " << num1 << " " << x << " " << num2 << " " << y << std::endl;
+	if (valid and gcd == 1) {
+		std::cout << "Inverse of " << orig_num << " (mod " << mod << ") is " << x << std::endl;
 	} else {
-		std::cout << "No GCD found" << std::endl;
+		std::cout << "Inverse does not exist" << std::endl;
 	}
 
 	return 0;
