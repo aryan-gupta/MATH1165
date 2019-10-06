@@ -14,7 +14,7 @@ namespace detail {
 /// @return The remainder
 std::pair<int, int> division_algo(int num, int den) {
 	assert(den > 0);
-	int quot = num / den; // will auto round down
+	int quot = std::floor(num / (float)den); // will round toward -inf
 	int rem = num - den * quot;
 	return { quot, rem };
 }
