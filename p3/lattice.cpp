@@ -10,6 +10,8 @@ using std::cout;
 using std::endl;
 using std::vector;
 
+#define USE_FLOAT
+
 #ifdef USE_FLOAT
 using ull = long double;
 constexpr ull MAX = std::numeric_limits<ull>::max();
@@ -35,12 +37,17 @@ ull calculate_lattice_paths(size_t n) {
 	vector<vector<ull>> map{ n, vector<ull>(n) }; // n x n array
 	for (size_t ii = 1; ii < n; ++ii) {
 		for (size_t jj = 1; jj <= ii; ++jj) {
+			// get routes from left cell and above cell
 			ull left = get_map_element(map, jj - 1, ii);
 			ull top = get_map_element(map, jj, ii - 1);
+
+			// check if overflow will happen
 			if ((left > 0) && (top > MAX - left)) {
 				cout << "Overflow error" << endl;
 				return 0;
 			}
+
+			// calculate current path routes
 			map[ii][jj] = left + top;
 
 			// std::cout << "(" << ii << ", " << jj << ")" << "   ";
@@ -54,9 +61,9 @@ ull calculate_lattice_paths(size_t n) {
 
 int main(int ac, char **av) {
 #ifdef USE_FLOAT
-	cout << "Using floating point. Max dim is 8195. Compile with g++ <file> to use uintmax_t\n";
+	cout << "Using " << (sizeof(ull) * 8) << "-bit floating precision numbers.\nMax dim is 8195 (tested with 128-bit floats).\nCompile with g++ <file> to use uintmax_t\n";
 #else
-	cout << "Max dim is 33. If larger dim (up to 8195) is needed compile with g++ -DUSE_FLOAT <file>\n";
+	cout << "Using " << (sizeof(ull) * 8) << "-bit unsigned integers.\nMax dim is 33 (tested with 64-bit unsigned integers). \nIf larger dim (up to 8195) is needed compile with g++ -DUSE_FLOAT <file>\n";
 #endif
 	cout << "Enter dimensions:: ";
 	int n;
