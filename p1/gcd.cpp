@@ -148,6 +148,7 @@ int main(int ac, char **av) {
 #endif
 
 	if (valid) {
+		std::cout << "GCD:: " << gcd << std::endl;
 		std::cout << gcd << " = " << num1 << " (" << x << ") + " << num2 << " (" << y << ")" << std::endl;
 		// std::cout << gcd << " " << num1 << " " << x << " " << num2 << " " << y << std::endl;
 	} else {
